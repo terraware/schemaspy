@@ -1,4 +1,4 @@
-FROM openjdk:17-alpine3.14
+FROM eclipse-temurin:18
 
 ENV LC_ALL=C
 
@@ -20,9 +20,10 @@ LABEL GIT_REVISION=$GIT_REVISION
 
 ADD docker/open-sans.tar.gz /usr/share/fonts/
 
-RUN adduser java -h / -D && \
+RUN useradd java -d / -M && \
     set -x && \
-    apk add --no-cache curl unzip graphviz fontconfig && \
+    apt-get update && \
+    apt-get install -y curl unzip graphviz fontconfig && \
     fc-cache -fv && \
     mkdir /drivers_inc && \
     cd /drivers_inc && \
@@ -36,8 +37,7 @@ RUN adduser java -h / -D && \
       -o jtds-$JTDS_VERSION.jar && \
     mkdir /output && \
     chown -R java /drivers_inc && \
-    chown -R java /output && \
-    apk del curl
+    chown -R java /output
 
 
 ADD target/schema*-app.jar /usr/local/lib/schemaspy/
